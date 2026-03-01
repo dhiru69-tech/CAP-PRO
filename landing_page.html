@@ -1,0 +1,1296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>ReconMind — AI Reconnaissance Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --bg:#0c0c0e;
+  --bg2:#111114;
+  --bg3:#18181d;
+  --surface:#1e1e24;
+  --surface2:#26262e;
+  --border:#2a2a35;
+  --border2:#333340;
+  --text:#f0eff0;
+  --text2:#9998a8;
+  --text3:#5a5a6e;
+  --accent:#6366f1;
+  --accent2:#818cf8;
+  --accent-glow:rgba(99,102,241,0.15);
+  --accent-border:rgba(99,102,241,0.3);
+  --success:#22c55e;
+  --warning:#f59e0b;
+  --danger:#ef4444;
+  --radius:12px;
+  --radius-sm:8px;
+  --shadow-glow:0 0 40px rgba(99,102,241,0.08);
+}
+
+html{scroll-behavior:smooth}
+
+body{
+  font-family:'Geist',sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+  font-size:14px;
+  line-height:1.5;
+  overflow-x:hidden;
+}
+
+/* ═══════════════════════════
+   GLOBAL
+═══════════════════════════ */
+.btn{
+  display:inline-flex;align-items:center;gap:7px;
+  padding:10px 20px;border-radius:var(--radius-sm);
+  font-size:13.5px;font-weight:500;cursor:pointer;
+  border:none;transition:all 0.18s;font-family:inherit;
+  text-decoration:none;letter-spacing:-0.1px;
+}
+.btn svg{width:15px;height:15px;flex-shrink:0}
+.btn-primary{
+  background:var(--accent);color:#fff;
+  box-shadow:0 0 20px rgba(99,102,241,0.35);
+}
+.btn-primary:hover{background:#5254e8;box-shadow:0 0 30px rgba(99,102,241,0.5);transform:translateY(-1px)}
+.btn-ghost{background:transparent;color:var(--text2);border:1px solid var(--border2)}
+.btn-ghost:hover{background:var(--surface);color:var(--text);border-color:var(--border2)}
+.btn-google{
+  background:var(--surface2);color:var(--text);
+  border:1px solid var(--border2);gap:10px;
+  justify-content:center;width:100%;padding:12px 20px;
+  font-size:14px;
+}
+.btn-google:hover{background:var(--surface);border-color:var(--accent-border);box-shadow:0 0 20px var(--accent-glow)}
+
+.page{display:none;min-height:100vh}
+.page.active{display:flex;flex-direction:column}
+
+/* ═══════════════════════════
+   LANDING PAGE
+═══════════════════════════ */
+#landing{
+  background:var(--bg);
+  position:relative;
+  overflow:hidden;
+}
+
+/* Background grid */
+#landing::before{
+  content:'';position:absolute;inset:0;
+  background-image:
+    linear-gradient(var(--border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border) 1px, transparent 1px);
+  background-size:40px 40px;
+  opacity:0.3;
+  pointer-events:none;
+}
+
+/* Glow orb */
+#landing::after{
+  content:'';position:absolute;
+  top:-200px;left:50%;transform:translateX(-50%);
+  width:800px;height:600px;
+  background:radial-gradient(ellipse at center, rgba(99,102,241,0.12) 0%, transparent 70%);
+  pointer-events:none;
+}
+
+.nav{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:18px 48px;
+  border-bottom:1px solid var(--border);
+  position:relative;z-index:10;
+  background:rgba(12,12,14,0.8);
+  backdrop-filter:blur(12px);
+}
+
+.nav-logo{
+  display:flex;align-items:center;gap:10px;
+  font-size:16px;font-weight:600;color:var(--text);
+  letter-spacing:-0.3px;text-decoration:none;
+}
+
+.nav-logo-icon{
+  width:30px;height:30px;
+  background:var(--accent);
+  border-radius:7px;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 0 16px rgba(99,102,241,0.4);
+}
+.nav-logo-icon svg{width:16px;height:16px;stroke:white}
+
+.nav-badge{
+  font-size:9px;font-weight:600;letter-spacing:1px;
+  background:var(--accent-glow);color:var(--accent2);
+  border:1px solid var(--accent-border);
+  padding:2px 7px;border-radius:20px;
+}
+
+.nav-actions{display:flex;gap:10px;align-items:center}
+
+/* Hero */
+.hero{
+  flex:1;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  text-align:center;
+  padding:80px 24px 60px;
+  position:relative;z-index:2;
+}
+
+.hero-tag{
+  display:inline-flex;align-items:center;gap:6px;
+  font-size:12px;font-weight:500;
+  color:var(--accent2);
+  background:var(--accent-glow);
+  border:1px solid var(--accent-border);
+  padding:5px 14px;border-radius:20px;
+  margin-bottom:28px;
+  letter-spacing:0.3px;
+}
+.hero-tag-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);animation:blink 2s infinite}
+
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
+
+.hero-title{
+  font-family:'Instrument Serif',serif;
+  font-size:clamp(42px,6vw,72px);
+  font-weight:400;
+  color:var(--text);
+  line-height:1.1;
+  letter-spacing:-1px;
+  margin-bottom:12px;
+  max-width:760px;
+}
+
+.hero-title em{
+  font-style:italic;
+  color:var(--accent2);
+}
+
+.hero-sub{
+  font-size:16px;color:var(--text2);
+  max-width:460px;margin:0 auto 40px;
+  line-height:1.65;font-weight:300;
+}
+
+.hero-actions{display:flex;gap:12px;align-items:center;justify-content:center;flex-wrap:wrap}
+
+.hero-actions .btn-primary{padding:13px 28px;font-size:14.5px}
+
+.hero-note{font-size:12px;color:var(--text3);margin-top:16px}
+
+/* Feature strip */
+.features{
+  border-top:1px solid var(--border);
+  padding:40px 48px;
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:0;
+  position:relative;z-index:2;
+}
+
+.feature{
+  padding:24px 32px;
+  border-right:1px solid var(--border);
+  transition:background 0.2s;
+}
+.feature:last-child{border-right:none}
+.feature:hover{background:rgba(255,255,255,0.015)}
+
+.feature-icon{
+  width:36px;height:36px;
+  background:var(--surface);border:1px solid var(--border2);
+  border-radius:9px;
+  display:flex;align-items:center;justify-content:center;
+  margin-bottom:14px;
+}
+.feature-icon svg{width:16px;height:16px;stroke:var(--accent2)}
+
+.feature-title{font-size:14px;font-weight:600;color:var(--text);margin-bottom:6px}
+.feature-desc{font-size:13px;color:var(--text3);line-height:1.55}
+
+/* ═══════════════════════════
+   LOGIN MODAL OVERLAY
+═══════════════════════════ */
+.overlay{
+  position:fixed;inset:0;z-index:1000;
+  background:rgba(0,0,0,0.7);
+  backdrop-filter:blur(8px);
+  display:none;align-items:center;justify-content:center;
+  animation:fadeIn 0.2s ease;
+}
+.overlay.open{display:flex}
+
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes slideUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+
+.modal{
+  background:var(--bg2);
+  border:1px solid var(--border2);
+  border-radius:16px;
+  padding:36px;
+  width:100%;max-width:400px;
+  box-shadow:0 24px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(99,102,241,0.1);
+  animation:slideUp 0.25s ease forwards;
+  position:relative;
+}
+
+.modal-close{
+  position:absolute;top:16px;right:16px;
+  width:28px;height:28px;
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:6px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  color:var(--text3);transition:all 0.15s;font-size:16px;
+}
+.modal-close:hover{background:var(--surface2);color:var(--text)}
+
+.modal-logo{
+  display:flex;align-items:center;gap:9px;margin-bottom:24px;
+}
+.modal-logo-icon{
+  width:34px;height:34px;background:var(--accent);
+  border-radius:8px;display:flex;align-items:center;justify-content:center;
+  box-shadow:0 0 16px rgba(99,102,241,0.35);
+}
+.modal-logo-icon svg{width:18px;height:18px;stroke:white}
+.modal-logo-name{font-size:16px;font-weight:600;letter-spacing:-0.3px}
+
+.modal-title{font-size:20px;font-weight:600;color:var(--text);margin-bottom:6px;letter-spacing:-0.3px}
+.modal-sub{font-size:13px;color:var(--text3);margin-bottom:28px;line-height:1.5}
+
+.divider{
+  display:flex;align-items:center;gap:12px;
+  margin:20px 0;font-size:12px;color:var(--text3);
+}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border)}
+
+.terms{font-size:11.5px;color:var(--text3);margin-top:18px;text-align:center;line-height:1.6}
+.terms a{color:var(--accent2);text-decoration:none}
+.terms a:hover{text-decoration:underline}
+
+/* Google icon SVG inline */
+.google-icon{width:18px;height:18px;flex-shrink:0}
+
+/* Loading spinner */
+.spinner{
+  width:16px;height:16px;
+  border:2px solid rgba(255,255,255,0.2);
+  border-top-color:white;
+  border-radius:50%;
+  animation:spin 0.7s linear infinite;
+  display:none;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ═══════════════════════════
+   DASHBOARD
+═══════════════════════════ */
+#dashboard{
+  background:var(--bg);
+  flex-direction:row;
+}
+
+.sidebar{
+  width:224px;flex-shrink:0;
+  background:var(--bg2);
+  border-right:1px solid var(--border);
+  display:flex;flex-direction:column;
+  position:fixed;top:0;left:0;bottom:0;
+  z-index:10;
+}
+
+.sidebar-logo{
+  padding:18px 18px 14px;
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:9px;
+}
+.sidebar-logo-icon{
+  width:30px;height:30px;background:var(--accent);
+  border-radius:7px;display:flex;align-items:center;justify-content:center;
+  box-shadow:0 0 12px rgba(99,102,241,0.3);
+}
+.sidebar-logo-icon svg{width:15px;height:15px;stroke:white}
+.sidebar-logo-name{font-size:14.5px;font-weight:600;color:var(--text);letter-spacing:-0.3px}
+
+.sidebar-nav{padding:10px 8px;flex:1;overflow-y:auto}
+
+.nav-section-label{
+  font-size:10px;font-weight:600;letter-spacing:1px;
+  text-transform:uppercase;color:var(--text3);
+  padding:12px 10px 5px;
+}
+.nav-section-label:first-child{padding-top:4px}
+
+.nav-link{
+  display:flex;align-items:center;gap:9px;
+  padding:7px 10px;border-radius:var(--radius-sm);
+  color:var(--text2);font-size:13.5px;font-weight:400;
+  cursor:pointer;transition:all 0.12s;
+  user-select:none;text-decoration:none;
+}
+.nav-link svg{width:15px;height:15px;opacity:0.6;flex-shrink:0}
+.nav-link:hover{background:var(--surface);color:var(--text)}
+.nav-link:hover svg{opacity:0.9}
+.nav-link.active{background:var(--accent-glow);color:var(--accent2);border:1px solid var(--accent-border)}
+.nav-link.active svg{opacity:1}
+
+.sidebar-user{
+  padding:14px 16px;
+  border-top:1px solid var(--border);
+  display:flex;align-items:center;gap:10px;
+}
+
+.user-avatar{
+  width:30px;height:30px;border-radius:50%;
+  background:var(--accent);
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:600;color:white;
+  flex-shrink:0;overflow:hidden;
+}
+.user-avatar img{width:100%;height:100%;object-fit:cover}
+
+.user-info{flex:1;min-width:0}
+.user-name{font-size:12.5px;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.user-email{font-size:11px;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+.logout-btn{
+  width:26px;height:26px;border-radius:6px;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;background:transparent;border:none;
+  color:var(--text3);transition:all 0.12s;flex-shrink:0;
+}
+.logout-btn svg{width:14px;height:14px}
+.logout-btn:hover{background:var(--surface2);color:var(--danger)}
+
+/* Main area */
+.dash-main{
+  margin-left:224px;flex:1;
+  display:flex;flex-direction:column;min-height:100vh;
+}
+
+.topbar{
+  background:var(--bg2);
+  border-bottom:1px solid var(--border);
+  padding:14px 28px;
+  display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:5;
+  backdrop-filter:blur(12px);
+}
+
+.topbar-title{font-size:15px;font-weight:600;color:var(--text)}
+.topbar-sub{font-size:12px;color:var(--text3);margin-top:1px}
+
+.content{padding:24px 28px;flex:1}
+
+/* Cards */
+.card{
+  background:var(--bg2);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+}
+.card-header{
+  padding:16px 18px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+}
+.card-title{
+  font-size:13px;font-weight:600;color:var(--text);
+  display:flex;align-items:center;gap:7px;
+}
+.card-title svg{width:14px;height:14px;color:var(--text3)}
+.card-body{padding:16px 18px}
+
+/* Stat cards */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
+.stat-card{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:var(--radius);padding:16px 18px;
+  transition:border-color 0.2s;
+}
+.stat-card:hover{border-color:var(--border2)}
+.stat-label{font-size:11px;color:var(--text3);font-weight:500;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px}
+.stat-value{font-size:28px;font-weight:600;color:var(--text);letter-spacing:-1px;line-height:1}
+.stat-note{font-size:12px;color:var(--text3);margin-top:6px}
+
+/* Grid */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+.mb-20{margin-bottom:20px}
+.mb-16{margin-bottom:16px}
+
+/* Target Input Section */
+.scan-section{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:var(--radius);padding:22px;
+  margin-bottom:20px;
+  transition:border-color 0.2s;
+}
+.scan-section:hover{border-color:var(--border2)}
+
+.section-label{
+  font-size:11.5px;font-weight:600;text-transform:uppercase;
+  letter-spacing:0.7px;color:var(--text3);margin-bottom:14px;
+  display:flex;align-items:center;gap:7px;
+}
+.section-label svg{width:13px;height:13px}
+
+.input-row{display:flex;gap:10px;align-items:flex-end}
+.input-group{flex:1}
+.input-label{font-size:12px;font-weight:500;color:var(--text2);margin-bottom:6px;display:block}
+
+.input{
+  width:100%;padding:10px 14px;
+  border:1px solid var(--border2);
+  border-radius:var(--radius-sm);
+  font-size:13.5px;font-family:'Geist Mono',monospace;
+  color:var(--text);background:var(--surface);
+  outline:none;transition:all 0.15s;
+}
+.input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-glow)}
+.input::placeholder{color:var(--text3);font-family:'Geist',sans-serif}
+
+.select{
+  padding:10px 14px;border:1px solid var(--border2);
+  border-radius:var(--radius-sm);
+  font-size:13px;font-family:inherit;
+  color:var(--text);background:var(--surface);outline:none;cursor:pointer;
+}
+
+/* Dork tags */
+.dork-grid{display:flex;flex-wrap:wrap;gap:6px}
+.dork-tag{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:5px 12px;border-radius:20px;
+  font-size:12px;font-weight:500;cursor:pointer;
+  border:1px solid transparent;transition:all 0.12s;user-select:none;
+}
+.dork-tag.file{background:rgba(245,158,11,0.08);color:#f59e0b;border-color:rgba(245,158,11,0.2)}
+.dork-tag.admin{background:rgba(239,68,68,0.08);color:#ef4444;border-color:rgba(239,68,68,0.2)}
+.dork-tag.cred{background:rgba(99,102,241,0.08);color:var(--accent2);border-color:var(--accent-border)}
+.dork-tag.config{background:rgba(34,197,94,0.08);color:#22c55e;border-color:rgba(34,197,94,0.2)}
+.dork-tag.active{filter:brightness(1.2)}
+.dork-tag:not(.active){opacity:0.4}
+
+/* Progress */
+.progress-wrap{background:var(--surface);border-radius:99px;height:4px;overflow:hidden;margin:12px 0}
+.progress-fill{height:100%;border-radius:99px;background:var(--accent);transition:width 0.5s ease;box-shadow:0 0 8px var(--accent)}
+
+.progress-steps{display:flex;gap:6px;margin-top:10px}
+.step{
+  flex:1;text-align:center;font-size:11px;padding:5px 4px;
+  border-radius:5px;color:var(--text3);background:var(--surface);
+}
+.step.done{color:var(--success);background:rgba(34,197,94,0.08)}
+.step.active{color:var(--accent2);background:var(--accent-glow);font-weight:500}
+
+/* Scan log */
+.scan-log{
+  background:var(--bg);border:1px solid var(--border);
+  border-radius:var(--radius-sm);padding:12px 14px;
+  font-family:'Geist Mono',monospace;font-size:11.5px;
+  color:var(--text2);line-height:1.9;max-height:160px;overflow-y:auto;
+  margin-top:12px;
+}
+.log-ts{color:var(--text3);margin-right:8px}
+.log-ok{color:var(--success)}
+.log-info{color:var(--accent2)}
+
+/* Badges */
+.badge{
+  display:inline-flex;align-items:center;
+  padding:3px 8px;border-radius:20px;
+  font-size:11px;font-weight:500;white-space:nowrap;
+}
+.badge-high{background:rgba(239,68,68,0.1);color:#ef4444}
+.badge-medium{background:rgba(245,158,11,0.1);color:#f59e0b}
+.badge-low{background:rgba(99,102,241,0.1);color:var(--accent2)}
+.badge-none{background:var(--surface);color:var(--text3)}
+
+/* History table */
+.table{width:100%;border-collapse:collapse}
+.table th{
+  text-align:left;padding:9px 14px;
+  font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;
+  color:var(--text3);border-bottom:1px solid var(--border);
+}
+.table td{
+  padding:11px 14px;border-bottom:1px solid var(--border);
+  font-size:13px;color:var(--text2);
+}
+.table tr:last-child td{border-bottom:none}
+.table tr:hover td{background:rgba(255,255,255,0.015);color:var(--text)}
+
+.result-url{
+  font-family:'Geist Mono',monospace;font-size:12px;
+  color:var(--accent2);text-decoration:none;
+  max-width:300px;display:block;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.result-url:hover{text-decoration:underline}
+
+/* Empty state */
+.empty{text-align:center;padding:40px 20px;color:var(--text3)}
+.empty svg{width:36px;height:36px;margin:0 auto 10px;display:block;opacity:0.2}
+.empty-title{font-size:14px;font-weight:500;color:var(--text2);margin-bottom:4px}
+.empty-sub{font-size:12.5px}
+
+/* System status */
+.status-item{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:9px 12px;border-radius:var(--radius-sm);
+  margin-bottom:6px;background:var(--bg);border:1px solid var(--border);
+}
+.status-label{font-size:13px;color:var(--text)}
+.status-online{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--success)}
+.status-offline{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--text3)}
+.dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.dot-green{background:var(--success);box-shadow:0 0 6px var(--success);animation:blink 2s infinite}
+.dot-grey{background:var(--text3)}
+
+/* Welcome banner */
+.welcome{
+  background:linear-gradient(135deg,rgba(99,102,241,0.08) 0%,rgba(99,102,241,0.03) 100%);
+  border:1px solid var(--accent-border);
+  border-radius:var(--radius);
+  padding:20px 24px;margin-bottom:20px;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.welcome-text h3{font-size:15px;font-weight:600;color:var(--text);margin-bottom:3px}
+.welcome-text p{font-size:13px;color:var(--text3)}
+
+/* Workspace tabs */
+.tabs{display:flex;gap:2px;border-bottom:1px solid var(--border);margin-bottom:18px}
+.tab{
+  padding:9px 16px;font-size:13px;cursor:pointer;
+  color:var(--text3);border-bottom:2px solid transparent;
+  margin-bottom:-1px;transition:all 0.12s;
+}
+.tab:hover{color:var(--text2)}
+.tab.active{color:var(--accent2);border-bottom-color:var(--accent)}
+
+/* Scrollbar */
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+
+/* Animations */
+@keyframes appear{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.appear{animation:appear 0.3s ease forwards}
+
+/* ═══════════════════════════
+   RESPONSIVE
+═══════════════════════════ */
+@media(max-width:900px){
+  .features{grid-template-columns:1fr}
+  .feature{border-right:none;border-bottom:1px solid var(--border)}
+  .feature:last-child{border-bottom:none}
+  .stats-grid{grid-template-columns:repeat(2,1fr)}
+  .grid-2{grid-template-columns:1fr}
+  .nav{padding:14px 20px}
+  .hero{padding:60px 20px 40px}
+}
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════
+     PAGE 1: LANDING
+════════════════════════════════════ -->
+<div id="landing" class="page active" style="flex-direction:column">
+
+  <!-- Navbar -->
+  <nav class="nav">
+    <a class="nav-logo" href="#">
+      <div class="nav-logo-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+          <path d="M11 8v6M8 11h6"/>
+        </svg>
+      </div>
+      ReconMind
+      <span class="nav-badge">BETA</span>
+    </a>
+    <div class="nav-actions">
+      <button class="btn btn-ghost" onclick="openLogin()">Sign In</button>
+      <button class="btn btn-primary" onclick="openLogin()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        Start Scanning
+      </button>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-tag">
+      <span class="hero-tag-dot"></span>
+      AI-Powered Reconnaissance Platform
+    </div>
+    <h1 class="hero-title">
+      Intelligent recon,<br/><em>built for security teams.</em>
+    </h1>
+    <p class="hero-sub">
+      ReconMind combines automated dork-based discovery with a local AI model to surface exposures, classify risks, and generate actionable reports.
+    </p>
+    <div class="hero-actions">
+      <button class="btn btn-primary" onclick="openLogin()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        Start Scanning — It's Free
+      </button>
+      <button class="btn btn-ghost" style="font-size:13.5px">View Architecture →</button>
+    </div>
+    <p class="hero-note">Requires Google Sign-In · Local AI model · No data leaves your server</p>
+  </section>
+
+  <!-- Features -->
+  <div class="features">
+    <div class="feature">
+      <div class="feature-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/>
+        </svg>
+      </div>
+      <div class="feature-title">Dynamic Dork Engine</div>
+      <div class="feature-desc">Generates targeted dorks per category — file exposure, admin panels, credential leaks, config files — for any domain.</div>
+    </div>
+    <div class="feature">
+      <div class="feature-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <path d="M12 2a10 10 0 1 0 10 10"/><circle cx="18" cy="6" r="3"/>
+        </svg>
+      </div>
+      <div class="feature-title">Local AI Analysis</div>
+      <div class="feature-desc">Your own trained AI model analyzes scanner output, classifies findings, explains risks, and suggests remediation — no external API.</div>
+    </div>
+    <div class="feature">
+      <div class="feature-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+        </svg>
+      </div>
+      <div class="feature-title">Detailed Reports</div>
+      <div class="feature-desc">Export structured reports with scan summary, evidence, AI analysis, and recommended fixes. Built for real security workflows.</div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════
+     LOGIN MODAL
+════════════════════════════════════ -->
+<div class="overlay" id="loginOverlay" onclick="handleOverlayClick(event)">
+  <div class="modal" id="loginModal">
+    <button class="modal-close" onclick="closeLogin()">✕</button>
+
+    <div class="modal-logo">
+      <div class="modal-logo-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/><path d="M11 8v6M8 11h6"/>
+        </svg>
+      </div>
+      <span class="modal-logo-name">ReconMind</span>
+    </div>
+
+    <h2 class="modal-title">Welcome back</h2>
+    <p class="modal-sub">Sign in to access your workspace, scan history, and reports.</p>
+
+    <button class="btn btn-google" id="googleBtn" onclick="handleGoogleLogin()">
+      <!-- Google icon -->
+      <svg class="google-icon" viewBox="0 0 24 24">
+        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+      </svg>
+      <span id="googleBtnText">Continue with Google</span>
+      <div class="spinner" id="loginSpinner"></div>
+    </button>
+
+    <div class="divider">or</div>
+
+    <div style="background:var(--bg3,#0f0f12);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 16px;text-align:center">
+      <div style="font-size:12px;color:var(--text3);margin-bottom:3px">🔒 Demo Mode</div>
+      <div style="font-size:12px;color:var(--text2)">Click Google login to simulate authentication</div>
+    </div>
+
+    <p class="terms">
+      By continuing you agree to our <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.
+      Your data stays on your server.
+    </p>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════
+     PAGE 2: DASHBOARD
+════════════════════════════════════ -->
+<div id="dashboard" class="page" style="flex-direction:row">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="sidebar-logo-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/><path d="M11 8v6M8 11h6"/>
+        </svg>
+      </div>
+      <span class="sidebar-logo-name">ReconMind</span>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Workspace</div>
+      <a class="nav-link active" onclick="showView('home')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        Dashboard
+      </a>
+      <a class="nav-link" onclick="showView('scan')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
+        New Scan
+      </a>
+      <a class="nav-link" onclick="showView('results')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+        Results
+      </a>
+
+      <div class="nav-section-label">Tools</div>
+      <a class="nav-link" onclick="showView('dorks')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+        Dork Engine
+      </a>
+      <a class="nav-link" onclick="showView('ai')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 1 0 10 10"/><circle cx="18" cy="6" r="3"/></svg>
+        AI Analysis
+      </a>
+      <a class="nav-link" onclick="showView('reports')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        Reports
+      </a>
+
+      <div class="nav-section-label">Account</div>
+      <a class="nav-link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        Profile
+      </a>
+      <a class="nav-link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M1 12h4M19 12h4"/></svg>
+        Settings
+      </a>
+    </nav>
+
+    <div class="sidebar-user">
+      <div class="user-avatar" id="userAvatar">U</div>
+      <div class="user-info">
+        <div class="user-name" id="userName">User</div>
+        <div class="user-email" id="userEmail">user@gmail.com</div>
+      </div>
+      <button class="logout-btn" onclick="handleLogout()" title="Sign out">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+          <polyline points="16 17 21 12 16 7"/>
+          <line x1="21" y1="12" x2="9" y2="12"/>
+        </svg>
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <div class="dash-main">
+
+    <!-- ── HOME VIEW ── -->
+    <div id="view-home">
+      <div class="topbar">
+        <div>
+          <div class="topbar-title">Dashboard</div>
+          <div class="topbar-sub" id="welcomeSub">Good to see you back</div>
+        </div>
+        <button class="btn btn-primary" onclick="showView('scan')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          New Scan
+        </button>
+      </div>
+      <div class="content appear">
+
+        <!-- Welcome -->
+        <div class="welcome">
+          <div class="welcome-text">
+            <h3 id="welcomeMsg">Welcome to ReconMind 👋</h3>
+            <p>Your workspace is ready. Start your first scan or explore the dork engine.</p>
+          </div>
+          <button class="btn btn-primary" onclick="showView('scan')">Start First Scan →</button>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-grid mb-20">
+          <div class="stat-card">
+            <div class="stat-label">Total Scans</div>
+            <div class="stat-value">0</div>
+            <div class="stat-note">No scans yet</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Targets</div>
+            <div class="stat-value">0</div>
+            <div class="stat-note">Add your first target</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Findings</div>
+            <div class="stat-value">0</div>
+            <div class="stat-note">Awaiting first scan</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Reports</div>
+            <div class="stat-value">0</div>
+            <div class="stat-note">Generated reports</div>
+          </div>
+        </div>
+
+        <div class="grid-2 mb-20">
+          <!-- Scan History -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                Recent Scans
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="empty">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+                <div class="empty-title">No scans yet</div>
+                <div class="empty-sub">Your scan history will appear here</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- System Status -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                System Status
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="status-item">
+                <span class="status-label">Frontend</span>
+                <span class="status-online"><span class="dot dot-green"></span>Online</span>
+              </div>
+              <div class="status-item">
+                <span class="status-label">Auth System</span>
+                <span class="status-online"><span class="dot dot-green"></span>Active (Demo)</span>
+              </div>
+              <div class="status-item">
+                <span class="status-label">Backend API</span>
+                <span class="status-offline"><span class="dot dot-grey"></span>Not started</span>
+              </div>
+              <div class="status-item">
+                <span class="status-label">Scanner Engine</span>
+                <span class="status-offline"><span class="dot dot-grey"></span>Not started</span>
+              </div>
+              <div class="status-item" style="margin-bottom:0">
+                <span class="status-label">AI Model</span>
+                <span class="status-offline"><span class="dot dot-grey"></span>Not trained</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SCAN VIEW ── -->
+    <div id="view-scan" style="display:none">
+      <div class="topbar">
+        <div>
+          <div class="topbar-title">New Scan</div>
+          <div class="topbar-sub">Configure and launch a reconnaissance scan</div>
+        </div>
+      </div>
+      <div class="content appear">
+        <div class="scan-section">
+          <div class="section-label">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>
+            Target Configuration
+          </div>
+          <div class="input-row mb-16">
+            <div class="input-group">
+              <label class="input-label">Target Domain</label>
+              <input class="input" id="targetInput" type="text" placeholder="example.com"/>
+            </div>
+            <div>
+              <label class="input-label">Scan Depth</label>
+              <select class="select">
+                <option>Surface</option>
+                <option>Standard</option>
+                <option>Deep</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="section-label" style="margin-top:18px">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+            Dork Categories
+          </div>
+          <div class="dork-grid mb-16">
+            <div class="dork-tag file active" onclick="this.classList.toggle('active')">📁 File Exposure</div>
+            <div class="dork-tag admin active" onclick="this.classList.toggle('active')">🔐 Admin Panels</div>
+            <div class="dork-tag cred active" onclick="this.classList.toggle('active')">🔑 Credential Leaks</div>
+            <div class="dork-tag config active" onclick="this.classList.toggle('active')">⚙️ Config Files</div>
+            <div class="dork-tag file" onclick="this.classList.toggle('active')">🗄️ Database Dumps</div>
+            <div class="dork-tag admin" onclick="this.classList.toggle('active')">📋 Log Files</div>
+            <div class="dork-tag cred" onclick="this.classList.toggle('active')">🔒 API Keys</div>
+            <div class="dork-tag config" onclick="this.classList.toggle('active')">📂 Backup Files</div>
+          </div>
+
+          <div style="display:flex;gap:10px;align-items:center">
+            <button class="btn btn-primary" id="startBtn" onclick="startScan()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+              Start Scan
+            </button>
+            <button class="btn btn-ghost" onclick="resetScan()">Reset</button>
+            <span id="scanStatusMsg" style="font-size:12px;color:var(--text3)"></span>
+          </div>
+        </div>
+
+        <!-- Progress Card -->
+        <div class="card" id="progressCard" style="display:none">
+          <div class="card-header">
+            <div class="card-title">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-.39-4.38"/></svg>
+              Scan Progress
+            </div>
+            <span id="pctLabel" style="font-size:12px;font-weight:600;color:var(--accent2)">0%</span>
+          </div>
+          <div class="card-body">
+            <div class="progress-wrap"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+            <div class="progress-steps">
+              <div class="step" id="s1">1. Init</div>
+              <div class="step" id="s2">2. Dorks</div>
+              <div class="step" id="s3">3. Discovery</div>
+              <div class="step" id="s4">4. Validate</div>
+              <div class="step" id="s5">5. Evidence</div>
+            </div>
+            <div class="scan-log" id="scanLog">
+              <span><span class="log-ts">00:00:00</span>Scanner ready. Waiting for input...</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── RESULTS VIEW ── -->
+    <div id="view-results" style="display:none">
+      <div class="topbar">
+        <div>
+          <div class="topbar-title">Results</div>
+          <div class="topbar-sub">All discovered URLs and findings</div>
+        </div>
+        <button class="btn btn-ghost">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Export Report
+        </button>
+      </div>
+      <div class="content appear">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Discovered URLs</div>
+            <span style="font-size:12px;color:var(--text3)">0 results</span>
+          </div>
+          <div class="card-body">
+            <div class="empty">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+              <div class="empty-title">No results yet</div>
+              <div class="empty-sub">Discovered URLs will appear here after a scan. All links open in new tabs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── DORKS VIEW ── -->
+    <div id="view-dorks" style="display:none">
+      <div class="topbar">
+        <div>
+          <div class="topbar-title">Dork Engine</div>
+          <div class="topbar-sub">View and manage dork templates</div>
+        </div>
+      </div>
+      <div class="content appear">
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-header"><div class="card-title">File Exposure</div><span class="badge badge-medium">High</span></div>
+            <div class="card-body" style="display:flex;flex-direction:column;gap:6px">
+              <code style="display:block;padding:8px 10px;background:var(--bg);border-radius:6px;font-size:12px;color:var(--text2);border:1px solid var(--border)">site:{target} ext:sql</code>
+              <code style="display:block;padding:8px 10px;background:var(--bg);border-radius:6px;font-size:12px;color:var(--text2);border:1px solid var(--border)">site:{target} ext:bak</code>
+              <code style="display:block;padding:8px 10px;background:var(--bg);border-radius:6px;font-size:12px;color:var(--text2);border:1px solid var(--border)">site:{target} ext:log</code>
+              <code style="display:block;padding:8px 10px;background:var(--bg);border-radius:6px;font-size:12px;color:var(--text2);border:1px solid var(--border)">site:{target} "index of" backup</code>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-title">Admin Panels</div><span class="badge badge-high">Critical</span></div>
+            <div class="card-body" style="display:flex;flex-direction:column;gap:6px">
+              <code style="display:block;padding:8px 10px;background:var(--bg);border-radius:6px;font-size:12px;color:var(--text2);border:1px solid var(--border)">site:{target} inurl:admin</code>
+              <code style="display:block;padding:8px 10px;background:var(--bg);border-radius:6px;font-size:12px;color:var(--text2);border:1px solid var(--border)">site:{target} inurl:login</code>
+              <code style="display:block;padding:8px 10px;background:var(--bg);border-radius:6px;font-size:12px;color:var(--text2);border:1px solid var(--border)">site:{target} intitle:"admin panel"</code>
+              <code style="display:block;padding:8px 10px;background:var(--bg);border-radius:6px;font-size:12px;color:var(--text2);border:1px solid var(--border)">site:{target} inurl:wp-admin</code>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-title">Credential Leaks</div><span class="badge badge-high">Critical</span></div>
+            <div class="card-body" style="display:flex;flex-direction:column;gap:6px">
+              <code style="display:block;padding:8px 10px;background:var(--bg);border-radius:6px;font-size:12px;color:var(--text2);border:1px solid var(--border)">site:{target} "api_key" OR "api_secret"</code>
+              <code style="display:block;padding:8px 10px;background:var(--bg);border-radius:6px;font-size:12px;color:var(--text2);border:1px solid var(--border)">site:{target} "DB_PASSWORD" ext:env</code>
+              <code style="display:block;padding:8px 10px;background:var(--bg);border-radius:6px;font-size:12px;color:var(--text2);border:1px solid var(--border)">site:{target} "password" filetype:txt</code>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-title">Config Files</div><span class="badge badge-medium">High</span></div>
+            <div class="card-body" style="display:flex;flex-direction:column;gap:6px">
+              <code style="display:block;padding:8px 10px;background:var(--bg);border-radius:6px;font-size:12px;color:var(--text2);border:1px solid var(--border)">site:{target} ext:xml inurl:config</code>
+              <code style="display:block;padding:8px 10px;background:var(--bg);border-radius:6px;font-size:12px;color:var(--text2);border:1px solid var(--border)">site:{target} ".htaccess"</code>
+              <code style="display:block;padding:8px 10px;background:var(--bg);border-radius:6px;font-size:12px;color:var(--text2);border:1px solid var(--border)">site:{target} "web.config" ext:config</code>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── AI VIEW ── -->
+    <div id="view-ai" style="display:none">
+      <div class="topbar">
+        <div>
+          <div class="topbar-title">AI Analysis</div>
+          <div class="topbar-sub">Local AI model — integrated after training</div>
+        </div>
+      </div>
+      <div class="content appear">
+        <div class="card mb-20">
+          <div class="card-body" style="padding:30px;text-align:center">
+            <div style="width:52px;height:52px;background:var(--accent-glow);border:1px solid var(--accent-border);border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--accent2)" stroke-width="1.8"><path d="M12 2a10 10 0 1 0 10 10"/><circle cx="18" cy="6" r="3"/></svg>
+            </div>
+            <h3 style="font-size:16px;font-weight:600;margin-bottom:6px">AI Model Not Trained Yet</h3>
+            <p style="font-size:13px;color:var(--text3);max-width:400px;margin:0 auto">Once scan data is collected and the training pipeline runs, AI will classify findings, explain exposures, and suggest remediations — all locally.</p>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">Pipeline</div></div>
+          <div class="card-body">
+            <div style="display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap">
+              <div style="padding:10px 16px;background:var(--surface);border:1px solid var(--border);border-radius:8px;font-size:13px;text-align:center"><div style="font-size:10px;color:var(--text3);margin-bottom:2px">STEP 1</div>Scanner Data</div>
+              <div style="color:var(--text3)">→</div>
+              <div style="padding:10px 16px;background:var(--surface);border:1px solid var(--border);border-radius:8px;font-size:13px;text-align:center"><div style="font-size:10px;color:var(--text3);margin-bottom:2px">STEP 2</div>AI Model</div>
+              <div style="color:var(--text3)">→</div>
+              <div style="padding:10px 16px;background:var(--accent-glow);border:1px solid var(--accent-border);border-radius:8px;font-size:13px;color:var(--accent2);text-align:center"><div style="font-size:10px;color:var(--accent2);margin-bottom:2px">OUTPUT</div>Report</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── REPORTS VIEW ── -->
+    <div id="view-reports" style="display:none">
+      <div class="topbar">
+        <div>
+          <div class="topbar-title">Reports</div>
+          <div class="topbar-sub">Saved scan reports</div>
+        </div>
+      </div>
+      <div class="content appear">
+        <div class="card">
+          <div class="card-body">
+            <div class="empty">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              <div class="empty-title">No reports yet</div>
+              <div class="empty-sub">Reports will be generated after completed scans</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end dash-main -->
+</div><!-- end dashboard -->
+
+
+<script>
+// ════════════════════════════════════
+// STATE
+// ════════════════════════════════════
+const state = {
+  user: null,
+  loggedIn: false
+};
+
+// Fake user pool for demo
+const demoUsers = [
+  {name:'Arjun Sharma',email:'arjun.sharma@gmail.com'},
+  {name:'Rahul Verma',email:'rahul.verma@gmail.com'},
+  {name:'Priya Singh',email:'priya.singh@gmail.com'},
+];
+
+// ════════════════════════════════════
+// AUTH
+// ════════════════════════════════════
+function openLogin(){
+  document.getElementById('loginOverlay').classList.add('open');
+}
+
+function closeLogin(){
+  document.getElementById('loginOverlay').classList.remove('open');
+}
+
+function handleOverlayClick(e){
+  if(e.target === document.getElementById('loginOverlay')) closeLogin();
+}
+
+function handleGoogleLogin(){
+  const btn = document.getElementById('googleBtn');
+  const txt = document.getElementById('googleBtnText');
+  const spin = document.getElementById('loginSpinner');
+
+  btn.disabled = true;
+  txt.textContent = 'Authenticating...';
+  spin.style.display = 'block';
+
+  // Simulate OAuth flow
+  setTimeout(()=>{
+    const user = demoUsers[Math.floor(Math.random() * demoUsers.length)];
+    state.user = user;
+    state.loggedIn = true;
+
+    // Update UI with user info
+    const initials = user.name.split(' ').map(w=>w[0]).join('').toUpperCase();
+    document.getElementById('userAvatar').textContent = initials;
+    document.getElementById('userName').textContent = user.name;
+    document.getElementById('userEmail').textContent = user.email;
+    document.getElementById('welcomeMsg').textContent = `Welcome, ${user.name.split(' ')[0]} 👋`;
+    document.getElementById('welcomeSub').textContent = `Signed in as ${user.email}`;
+
+    // Reset button
+    btn.disabled = false;
+    txt.textContent = 'Continue with Google';
+    spin.style.display = 'none';
+
+    // Close modal, show dashboard
+    closeLogin();
+    showDashboard();
+  }, 1800);
+}
+
+function handleLogout(){
+  state.user = null;
+  state.loggedIn = false;
+  showLanding();
+}
+
+// ════════════════════════════════════
+// PAGE ROUTING
+// ════════════════════════════════════
+function showLanding(){
+  document.getElementById('landing').classList.add('active');
+  document.getElementById('dashboard').classList.remove('active');
+  document.getElementById('landing').style.display = '';
+  document.getElementById('dashboard').style.display = 'none';
+}
+
+function showDashboard(){
+  document.getElementById('landing').classList.remove('active');
+  document.getElementById('dashboard').classList.add('active');
+  document.getElementById('landing').style.display = 'none';
+  document.getElementById('dashboard').style.display = 'flex';
+  showView('home');
+}
+
+// Dashboard views
+const views = ['home','scan','results','dorks','ai','reports'];
+
+function showView(name){
+  views.forEach(v=>{
+    const el = document.getElementById('view-'+v);
+    if(el) el.style.display = 'none';
+  });
+  const target = document.getElementById('view-'+name);
+  if(target){ target.style.display = 'block'; }
+
+  // Update nav active state
+  document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+}
+
+// ════════════════════════════════════
+// SCAN UI (demo — no real scan)
+// ════════════════════════════════════
+function startScan(){
+  const target = document.getElementById('targetInput').value.trim();
+  if(!target){
+    const msg = document.getElementById('scanStatusMsg');
+    msg.textContent = '⚠ Enter a target domain first.';
+    msg.style.color = 'var(--danger)';
+    return;
+  }
+
+  document.getElementById('progressCard').style.display = 'block';
+  document.getElementById('startBtn').disabled = true;
+  document.getElementById('scanStatusMsg').textContent = '';
+
+  const steps = ['s1','s2','s3','s4','s5'];
+  const pcts = [10,28,55,80,100];
+  const logs = [
+    `Initializing scan session for ${target}...`,
+    `Generating dorks for selected categories...`,
+    `Discovery phase — backend not connected yet`,
+    `URL validation — scanner not connected yet`,
+    `Scan flow complete. Connect backend for real results.`,
+  ];
+
+  const logEl = document.getElementById('scanLog');
+  let i = 0;
+
+  function next(){
+    steps.forEach((s,idx)=>{
+      const el = document.getElementById(s);
+      el.className = 'step' + (idx < i ? ' done' : idx === i ? ' active' : '');
+    });
+    document.getElementById('progressFill').style.width = pcts[i]+'%';
+    document.getElementById('pctLabel').textContent = pcts[i]+'%';
+
+    const ts = new Date().toTimeString().split(' ')[0];
+    const cls = i===4 ? 'log-ok' : 'log-info';
+    logEl.innerHTML += `\n<span><span class="log-ts">${ts}</span><span class="${cls}">${logs[i]}</span></span>`;
+    logEl.scrollTop = logEl.scrollHeight;
+
+    i++;
+    if(i < steps.length) setTimeout(next, 1100);
+    else {
+      setTimeout(()=>{
+        steps.forEach(s=>{ document.getElementById(s).className='step done'; });
+        document.getElementById('startBtn').disabled = false;
+        document.getElementById('scanStatusMsg').textContent = 'Demo complete — connect backend for real scans.';
+        document.getElementById('scanStatusMsg').style.color = 'var(--success)';
+      }, 1100);
+    }
+  }
+  setTimeout(next, 300);
+}
+
+function resetScan(){
+  document.getElementById('targetInput').value = '';
+  document.getElementById('progressCard').style.display = 'none';
+  document.getElementById('scanStatusMsg').textContent = '';
+  document.getElementById('startBtn').disabled = false;
+  document.getElementById('progressFill').style.width = '0%';
+  document.getElementById('pctLabel').textContent = '0%';
+  ['s1','s2','s3','s4','s5'].forEach(s=>{ document.getElementById(s).className='step'; });
+  document.getElementById('scanLog').innerHTML = '<span><span class="log-ts">00:00:00</span>Scanner ready. Waiting for input...</span>';
+}
+
+// Init
+showLanding();
+</script>
+</body>
+</html>
