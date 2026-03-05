@@ -1,0 +1,24 @@
+# ReconMind Backend — Python Dependencies
+# Install: pip install -r requirements.txt
+
+# ── Core Framework ────────────────────────────────────────────────
+fastapi==0.115.0
+uvicorn[standard]==0.30.6
+
+# ── Database ──────────────────────────────────────────────────────
+sqlalchemy[asyncio]==2.0.36
+asyncpg==0.29.0          # Async PostgreSQL driver
+psycopg2-binary==2.9.9   # Sync driver (for migrations)
+
+# ── Auth ──────────────────────────────────────────────────────────
+python-jose[cryptography]==3.3.0   # JWT
+httpx==0.27.0                      # Async HTTP client (Google OAuth)
+python-multipart==0.0.9            # Form data parsing
+
+# ── Config ────────────────────────────────────────────────────────
+pydantic-settings==2.5.2
+pydantic==2.9.2
+python-dotenv==1.0.1
+
+# ── Utilities ─────────────────────────────────────────────────────
+passlib[bcrypt]==1.7.4   # Password hashing (future use)
