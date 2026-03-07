@@ -1,0 +1,12 @@
+# ReconMind Scanner — Python Dependencies
+# Install: pip install -r requirements.txt
+
+# ── Async HTTP ────────────────────────────────────────────────────
+httpx[http2]==0.27.0      # Async HTTP client (discovery + validation)
+
+# ── Database ──────────────────────────────────────────────────────
+sqlalchemy[asyncio]==2.0.36
+asyncpg==0.29.0
+
+# ── Utilities ─────────────────────────────────────────────────────
+python-dotenv==1.0.1
