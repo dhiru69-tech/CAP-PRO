@@ -1,0 +1,191 @@
+[
+  {
+    "dork": "site:{target} ext:sql",
+    "category": "file_exposure",
+    "risk": "critical",
+    "what_it_finds": "Exposed SQL database files directly accessible from the web",
+    "why_dangerous": "SQL files can contain full database dumps including user credentials, hashed passwords, personal data, and internal schema. Direct public access means anyone can download the entire database.",
+    "example_finding": "https://example.com/backup/users.sql",
+    "remediation": "Remove SQL files from web-accessible directories. Store database backups outside the webroot. Add .htaccess rules to block .sql extension access. Use authenticated access for any backup retrieval."
+  },
+  {
+    "dork": "site:{target} ext:env",
+    "category": "credential_leaks",
+    "risk": "critical",
+    "what_it_finds": "Exposed .env environment configuration files",
+    "why_dangerous": ".env files typically contain API keys, database passwords, JWT secrets, third-party service credentials, and other sensitive configuration. Exposing these grants attackers direct access to all connected services.",
+    "example_finding": "https://example.com/.env",
+    "remediation": "Never place .env files in web-accessible directories. Add .env to .gitignore. Use server-side environment variables or secrets managers (AWS Secrets Manager, HashiCorp Vault). Rotate all exposed credentials immediately."
+  },
+  {
+    "dork": "site:{target} ext:bak",
+    "category": "backup_files",
+    "risk": "high",
+    "what_it_finds": "Backup files with .bak extension left in web-accessible locations",
+    "why_dangerous": "Backup files often contain copies of configuration files, source code, or database content. They reveal internal application structure and may contain credentials from older configurations.",
+    "example_finding": "https://example.com/config.php.bak",
+    "remediation": "Delete all backup files from production web servers. Implement a policy that backups are stored only in secure, non-public storage. Audit the web directory periodically for backup artifacts."
+  },
+  {
+    "dork": "site:{target} inurl:admin",
+    "category": "admin_panels",
+    "risk": "high",
+    "what_it_finds": "Admin panel or administrative interface URLs",
+    "why_dangerous": "Exposed admin panels are high-value targets. If accessible without strong authentication or with default credentials, attackers can gain full control of the application, its data, and potentially the server.",
+    "example_finding": "https://example.com/admin/",
+    "remediation": "Restrict admin panel access by IP allowlist. Enforce multi-factor authentication. Move admin interfaces to non-standard paths. Monitor and alert on failed login attempts."
+  },
+  {
+    "dork": "site:{target} inurl:wp-admin",
+    "category": "admin_panels",
+    "risk": "high",
+    "what_it_finds": "WordPress admin panel (wp-admin)",
+    "why_dangerous": "WordPress admin is a common attack target for brute-force, credential stuffing, and plugin exploits. Publicly accessible wp-admin URLs allow automated attacks.",
+    "example_finding": "https://example.com/wp-admin/",
+    "remediation": "Enable two-factor authentication on WordPress. Restrict wp-admin access by IP. Use a security plugin (Wordfence, iThemes Security). Keep WordPress core and plugins updated."
+  },
+  {
+    "dork": "site:{target} ext:log",
+    "category": "log_files",
+    "risk": "medium",
+    "what_it_finds": "Application or server log files exposed publicly",
+    "why_dangerous": "Log files can reveal internal application paths, stack traces with code structure, user activity, IP addresses, session tokens, error messages exposing vulnerabilities, and sometimes partial credentials.",
+    "example_finding": "https://example.com/logs/error.log",
+    "remediation": "Move log files outside the webroot. Configure web server to deny access to .log files. Implement centralized log management (ELK stack, CloudWatch). Rotate logs and apply proper file permissions."
+  },
+  {
+    "dork": "site:{target} ext:xml inurl:config",
+    "category": "config_files",
+    "risk": "high",
+    "what_it_finds": "XML configuration files accessible from the web",
+    "why_dangerous": "XML config files (especially in Java/.NET apps) often contain database connection strings, LDAP credentials, service endpoints, and encryption keys in plaintext.",
+    "example_finding": "https://example.com/config/database.xml",
+    "remediation": "Move configuration files outside the webroot. Use environment variables for sensitive values. Implement proper web server deny rules for configuration file extensions."
+  },
+  {
+    "dork": "site:{target} \"DB_PASSWORD\" ext:env",
+    "category": "credential_leaks",
+    "risk": "critical",
+    "what_it_finds": "Environment files explicitly containing database password variables",
+    "why_dangerous": "Direct database credential exposure allows attackers to connect directly to the database, extract all data, modify records, or destroy the database entirely.",
+    "example_finding": "https://example.com/.env containing DB_PASSWORD=secret123",
+    "remediation": "Immediately rotate the exposed database password. Audit database access logs for unauthorized connections. Remove the .env file from web access. Review all systems using that credential."
+  },
+  {
+    "dork": "site:{target} ext:sql \"CREATE TABLE\"",
+    "category": "database_dumps",
+    "risk": "critical",
+    "what_it_finds": "Full database schema dump files with CREATE TABLE statements",
+    "why_dangerous": "Full database dumps reveal the complete data model, all table structures, stored data including user accounts, and potentially INSERT statements with real user data including password hashes.",
+    "example_finding": "https://example.com/backup/dump_2024.sql",
+    "remediation": "Immediately remove the exposed dump file. Treat all data in the dump as compromised. Notify affected users if personal data was exposed. Review backup procedures and storage locations."
+  },
+  {
+    "dork": "site:{target} \"aws_access_key_id\"",
+    "category": "api_keys",
+    "risk": "critical",
+    "what_it_finds": "AWS access key credentials exposed in files",
+    "why_dangerous": "Exposed AWS credentials can give attackers access to cloud infrastructure — S3 buckets, EC2 instances, RDS databases, Lambda functions. Attackers often use leaked AWS keys to mine cryptocurrency or steal data.",
+    "example_finding": "https://example.com/config.json containing aws_access_key_id",
+    "remediation": "Immediately revoke the exposed AWS keys in IAM console. Audit CloudTrail for unauthorized usage. Rotate all related credentials. Use IAM roles instead of access keys where possible."
+  },
+  {
+    "dork": "site:{target} intitle:\"index of\" \"backup\"",
+    "category": "file_exposure",
+    "risk": "high",
+    "what_it_finds": "Open directory listings containing backup files",
+    "why_dangerous": "Open directory listings expose the entire file structure. Combined with backup files, attackers can enumerate and download source code, configuration files, and data backups.",
+    "example_finding": "https://example.com/backup/ (open directory with multiple files)",
+    "remediation": "Disable directory listing in web server config (Options -Indexes in Apache, autoindex off in Nginx). Move backup directories outside webroot. Audit all publicly accessible directories."
+  },
+  {
+    "dork": "site:{target} inurl:phpmyadmin",
+    "category": "admin_panels",
+    "risk": "critical",
+    "what_it_finds": "phpMyAdmin database management interface",
+    "why_dangerous": "phpMyAdmin provides complete database administration via browser. If exposed publicly, it allows brute-force attacks, direct SQL execution, and complete database access without SSH.",
+    "example_finding": "https://example.com/phpmyadmin/",
+    "remediation": "Restrict phpMyAdmin to localhost or specific IPs only. Add HTTP authentication layer. Move to non-standard URL. Consider using a more secure alternative or SSH tunneling for database management."
+  },
+  {
+    "dork": "site:{target} \"private_key\" ext:pem",
+    "category": "credential_leaks",
+    "risk": "critical",
+    "what_it_finds": "Private key files (SSL/TLS, SSH) exposed publicly",
+    "why_dangerous": "Exposed private keys allow attackers to decrypt SSL/TLS traffic, impersonate the server, or gain SSH access to infrastructure. Compromising a private key invalidates all security guarantees.",
+    "example_finding": "https://example.com/ssl/server.key",
+    "remediation": "Immediately revoke and reissue all certificates using the exposed key. Remove key files from web-accessible locations. Audit server access logs. Implement proper key management procedures."
+  },
+  {
+    "dork": "site:{target} \"stripe_key\" OR \"stripe_secret\"",
+    "category": "api_keys",
+    "risk": "critical",
+    "what_it_finds": "Stripe payment API credentials exposed in source files",
+    "why_dangerous": "Exposed Stripe keys allow attackers to initiate charges, access customer payment data, issue refunds, and compromise the payment system. This also likely violates PCI-DSS compliance.",
+    "example_finding": "https://example.com/config.js containing stripe_secret_key",
+    "remediation": "Immediately revoke the exposed Stripe key in the Stripe dashboard. Generate new keys. Review Stripe logs for unauthorized API calls. Notify Stripe support of potential compromise."
+  },
+  {
+    "dork": "site:{target} ext:ini \"database\"",
+    "category": "config_files",
+    "risk": "high",
+    "what_it_finds": "INI configuration files referencing database settings",
+    "why_dangerous": "INI files (common in PHP applications) contain database hostnames, usernames, passwords, and connection strings. Exposure enables direct database access.",
+    "example_finding": "https://example.com/config/db.ini",
+    "remediation": "Store INI files outside the webroot. Use .htaccess to deny access to .ini files. Migrate sensitive configuration to environment variables."
+  },
+  {
+    "dork": "site:{target} \"exception\" ext:log",
+    "category": "log_files",
+    "risk": "medium",
+    "what_it_finds": "Exception and error log files showing application stack traces",
+    "why_dangerous": "Stack traces reveal internal file paths, framework versions, library names, and sometimes variable values. This information helps attackers craft targeted exploits.",
+    "example_finding": "https://example.com/storage/logs/laravel.log",
+    "remediation": "Configure application to log errors to secure locations outside webroot. Disable verbose error display in production. Use log management services that don't expose logs via HTTP."
+  },
+  {
+    "dork": "site:{target} ext:zip",
+    "category": "backup_files",
+    "risk": "high",
+    "what_it_finds": "ZIP archive files accessible from the web",
+    "why_dangerous": "ZIP files often contain source code archives, database backups, or bulk data exports. Downloading the ZIP file can expose the entire application codebase.",
+    "example_finding": "https://example.com/downloads/backup_2024.zip",
+    "remediation": "Remove ZIP files from public web directories. Use authenticated download endpoints for legitimate file sharing. Audit web directories for archival files."
+  },
+  {
+    "dork": "site:{target} \".htaccess\" filetype:htaccess",
+    "category": "config_files",
+    "risk": "medium",
+    "what_it_finds": "Apache .htaccess configuration files exposed",
+    "why_dangerous": ".htaccess files reveal URL rewriting rules, access restrictions, authentication requirements, and sometimes contain sensitive configuration. Knowing the exact rules helps attackers bypass protections.",
+    "example_finding": "https://example.com/.htaccess",
+    "remediation": "Configure Apache to deny access to .htaccess files (FilesMatch directive). Review what sensitive information is embedded in .htaccess configurations."
+  },
+  {
+    "dork": "site:{target} \"access_token\" filetype:json",
+    "category": "api_keys",
+    "risk": "critical",
+    "what_it_finds": "JSON files containing access tokens for APIs or services",
+    "why_dangerous": "Access tokens grant authenticated access to APIs, third-party services, or internal systems. Depending on scope, a leaked token can provide read/write access to sensitive resources.",
+    "example_finding": "https://example.com/config/tokens.json",
+    "remediation": "Revoke exposed tokens immediately. Implement token rotation. Store tokens in secrets management systems, never in files within the webroot."
+  },
+  {
+    "dork": "site:{target} inurl:dashboard",
+    "category": "admin_panels",
+    "risk": "medium",
+    "what_it_finds": "Dashboard interfaces (analytics, monitoring, admin)",
+    "why_dangerous": "Dashboard endpoints may expose business metrics, system health, user data, or administrative controls. Improperly secured dashboards can leak sensitive operational data.",
+    "example_finding": "https://example.com/dashboard/",
+    "remediation": "Implement authentication for all dashboard endpoints. Use role-based access control. Consider placing dashboards behind VPN or IP restrictions."
+  },
+  {
+    "dork": "site:{target} filetype:sql \"-- phpMyAdmin\"",
+    "category": "database_dumps",
+    "risk": "critical",
+    "what_it_finds": "phpMyAdmin-exported SQL database dumps",
+    "why_dangerous": "phpMyAdmin exports include full database structure and data. These files are commonly created during migrations and accidentally left in public directories.",
+    "example_finding": "https://example.com/export_2024-01-15.sql",
+    "remediation": "Delete all SQL export files from public directories. Set up a secure, non-public location for database exports. Implement automated checks to detect publicly accessible .sql files."
+  }
+]

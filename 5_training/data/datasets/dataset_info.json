@@ -1,0 +1,29 @@
+{
+  "name": "ReconMind Security Analysis Dataset",
+  "version": "1.0.0",
+  "created_at": "2026-02-25T09:30:26.356772",
+  "format": "ChatML (system/user/assistant)",
+  "base_model_recommended": "mistralai/Mistral-7B-Instruct-v0.2",
+  "splits": {
+    "train": 43,
+    "validation": 8,
+    "test": 3,
+    "total": 54
+  },
+  "estimated_tokens": {
+    "per_example_avg": 505,
+    "total": 27270
+  },
+  "files": {
+    "train": "train.jsonl",
+    "validation": "validation.jsonl",
+    "test": "test.jsonl"
+  },
+  "task_types": [
+    "finding_classification",
+    "risk_assessment",
+    "remediation_generation",
+    "dork_explanation",
+    "scan_summary_generation"
+  ]
+}

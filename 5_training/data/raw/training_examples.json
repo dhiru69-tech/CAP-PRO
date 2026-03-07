@@ -1,0 +1,303 @@
+[
+  {
+    "id": "ex_001",
+    "instruction": "Analyze this scan finding and explain the security risk.",
+    "input": {
+      "url": "https://example.com/backup/users_2024.sql",
+      "http_status": 200,
+      "category": "file_exposure",
+      "dork_used": "site:example.com ext:sql",
+      "title": "Index of /backup"
+    },
+    "output": {
+      "risk_level": "critical",
+      "title": "Exposed SQL Database Dump",
+      "explanation": "A publicly accessible SQL database dump file was found at the backup directory. This file is directly downloadable (HTTP 200) and contains the database structure and likely all user data. An attacker can download this file to obtain user credentials, personal information, and the full application data model.",
+      "impact": "Complete database exposure, potential credential theft, privacy violation",
+      "remediation": [
+        "Immediately remove or restrict access to the SQL file",
+        "Move all database backups outside the web-accessible directory",
+        "Rotate all passwords and credentials found in the dump",
+        "Notify affected users if personal data was exposed",
+        "Add web server rules to block .sql file access"
+      ]
+    }
+  },
+  {
+    "id": "ex_002",
+    "instruction": "Classify the severity of this finding and provide remediation steps.",
+    "input": {
+      "url": "https://target.com/.env",
+      "http_status": 200,
+      "category": "credential_leaks",
+      "dork_used": "site:target.com ext:env",
+      "title": null,
+      "snippet": "DB_HOST=localhost DB_PASSWORD=admin123 JWT_SECRET=myjwtsecret"
+    },
+    "output": {
+      "risk_level": "critical",
+      "title": "Exposed Environment Configuration File",
+      "explanation": "The application's .env configuration file is directly accessible via HTTP. The file contains database credentials and JWT signing secrets in plaintext. Anyone who accesses this URL can retrieve these credentials and use them to authenticate to the database directly or forge authentication tokens for the application.",
+      "impact": "Database takeover, authentication bypass, complete application compromise",
+      "remediation": [
+        "Immediately rotate the DB_PASSWORD and regenerate the JWT_SECRET",
+        "Remove the .env file from the webroot",
+        "Add .env to the web server's deny list",
+        "Audit login logs for unauthorized database access",
+        "Invalidate all existing JWT tokens and force re-authentication"
+      ]
+    }
+  },
+  {
+    "id": "ex_003",
+    "instruction": "Analyze this finding and determine if it represents a real security risk.",
+    "input": {
+      "url": "https://shop.example.com/admin/login",
+      "http_status": 200,
+      "category": "admin_panels",
+      "dork_used": "site:shop.example.com inurl:admin",
+      "title": "Admin Login — Example Shop"
+    },
+    "output": {
+      "risk_level": "high",
+      "title": "Exposed Admin Login Panel",
+      "explanation": "An administrative login panel is publicly accessible on the internet. While login pages are expected to exist, publicly exposing them allows attackers to perform brute-force attacks, credential stuffing with leaked password databases, and exploitation of any authentication vulnerabilities. The absence of IP restrictions or MFA makes this a high-value target.",
+      "impact": "Brute-force attacks, credential stuffing, potential admin takeover",
+      "remediation": [
+        "Restrict admin panel access to trusted IP addresses or VPN",
+        "Implement multi-factor authentication immediately",
+        "Enable CAPTCHA and rate limiting on the login form",
+        "Monitor and alert on repeated failed login attempts",
+        "Consider moving admin to a non-standard URL path"
+      ]
+    }
+  },
+  {
+    "id": "ex_004",
+    "instruction": "A scan found the following. Assess the risk level and explain your reasoning.",
+    "input": {
+      "url": "https://example.com/logs/app-error-2024-01-15.log",
+      "http_status": 200,
+      "category": "log_files",
+      "dork_used": "site:example.com ext:log",
+      "title": "Application Error Log",
+      "snippet": "PHP Fatal error: Call to undefined function in /var/www/html/app/models/User.php on line 42"
+    },
+    "output": {
+      "risk_level": "medium",
+      "title": "Exposed Application Error Log",
+      "explanation": "An application error log is publicly accessible and reveals internal server file paths (/var/www/html/app/models/User.php) and the PHP framework structure. While this is not an immediate credential leak, the disclosed information about internal paths, frameworks, and error patterns significantly helps attackers understand the application architecture and target their attacks more effectively.",
+      "impact": "Information disclosure, attack surface mapping, path traversal assistance",
+      "remediation": [
+        "Move log files outside the web-accessible directory",
+        "Configure the web server to deny access to .log files",
+        "Set up centralized log management (ELK, Splunk, CloudWatch)",
+        "Disable verbose error messages in production application config",
+        "Review logs to understand what has already been disclosed"
+      ]
+    }
+  },
+  {
+    "id": "ex_005",
+    "instruction": "Analyze this URL found during a reconnaissance scan.",
+    "input": {
+      "url": "https://api.example.com/config/database.xml",
+      "http_status": 200,
+      "category": "config_files",
+      "dork_used": "site:example.com ext:xml inurl:config",
+      "title": null,
+      "snippet": "connectionString server=db.internal username=appuser password=Sup3rS3cr3t"
+    },
+    "output": {
+      "risk_level": "critical",
+      "title": "Exposed Database Connection String in XML Config",
+      "explanation": "An XML configuration file containing a database connection string with plaintext credentials is publicly accessible. The snippet reveals the internal database hostname, username, and password. This allows direct database connection bypassing application-level security entirely.",
+      "impact": "Direct database access, credential theft, potential lateral movement to internal network",
+      "remediation": [
+        "Immediately change the database password",
+        "Remove the XML config file from the webroot",
+        "Migrate database credentials to environment variables or a secrets manager",
+        "Review database access logs for unauthorized connections from external IPs",
+        "Audit all other configuration files for similar exposure"
+      ]
+    }
+  },
+  {
+    "id": "ex_006",
+    "instruction": "This URL was found during scanning. Is it a security concern?",
+    "input": {
+      "url": "https://example.com/phpmyadmin/",
+      "http_status": 200,
+      "category": "admin_panels",
+      "dork_used": "site:example.com inurl:phpmyadmin",
+      "title": "phpMyAdmin"
+    },
+    "output": {
+      "risk_level": "critical",
+      "title": "Publicly Accessible phpMyAdmin Interface",
+      "explanation": "phpMyAdmin, a full-featured database administration tool, is accessible from the public internet. This provides a browser-based interface to execute arbitrary SQL queries, export databases, modify data, and potentially execute system commands. It is a prime target for automated attacks using default credentials and known vulnerabilities.",
+      "impact": "Full database control, potential remote code execution, data exfiltration",
+      "remediation": [
+        "Immediately restrict phpMyAdmin access to localhost or internal IPs only (deny from all, allow from 127.0.0.1)",
+        "Move to a non-standard URL or remove if not needed",
+        "Add HTTP Basic Authentication as an additional layer",
+        "Update phpMyAdmin to the latest version",
+        "Consider switching to more secure database administration methods (SSH tunnel)"
+      ]
+    }
+  },
+  {
+    "id": "ex_007",
+    "instruction": "Evaluate this security finding from a reconnaissance scan.",
+    "input": {
+      "url": "https://example.com/backup/site_backup_2024.zip",
+      "http_status": 200,
+      "category": "backup_files",
+      "dork_used": "site:example.com ext:zip",
+      "title": "site_backup_2024.zip",
+      "snippet": null
+    },
+    "output": {
+      "risk_level": "high",
+      "title": "Downloadable Website Backup Archive",
+      "explanation": "A ZIP backup archive of the website is downloadable without authentication. Backup archives typically contain the complete application source code, configuration files (including any that were incorrectly included), database exports, and media files. Downloading this archive gives attackers a complete picture of the application for offline analysis.",
+      "impact": "Source code disclosure, configuration exposure, potential credential discovery in config files",
+      "remediation": [
+        "Delete the backup file from the public web directory immediately",
+        "Store all backups in secure, non-web-accessible storage",
+        "Audit what was included in the archive and assess exposure",
+        "Implement automated monitoring to detect files like *.zip in public directories",
+        "Review backup procedures and policies"
+      ]
+    }
+  },
+  {
+    "id": "ex_008",
+    "instruction": "Assess this finding and generate a risk report entry.",
+    "input": {
+      "url": "https://example.com/static/config.js",
+      "http_status": 200,
+      "category": "api_keys",
+      "dork_used": "site:example.com \"GOOGLE_API_KEY\"",
+      "title": null,
+      "snippet": "const GOOGLE_API_KEY = 'AIzaSyXXXXXXXXXXXXXXX'; const STRIPE_PK = 'pk_live_XXXXXXXX';"
+    },
+    "output": {
+      "risk_level": "critical",
+      "title": "Hardcoded API Keys in Public JavaScript File",
+      "explanation": "Multiple production API keys are hardcoded in a publicly accessible JavaScript file. The Google API key can be abused for unauthorized use of Google services charged to the account. The Stripe publishable key combined with other information could assist in payment-related attacks. While publishable keys have limited direct risk, their presence alongside sensitive keys in source files suggests poor secrets management practices across the codebase.",
+      "impact": "API quota abuse, financial impact from unauthorized API usage, demonstrates poor security practices",
+      "remediation": [
+        "Immediately rotate both the Google API key and audit the Stripe account for anomalies",
+        "Restrict the Google API key to specific domains and APIs in the Google Cloud Console",
+        "Move all API keys to backend services — never include secret keys in frontend code",
+        "Implement a secrets scanning tool in your CI/CD pipeline to prevent future leaks",
+        "Audit the full codebase for other hardcoded credentials"
+      ]
+    }
+  },
+  {
+    "id": "ex_009",
+    "instruction": "A URL was found during recon. Explain what an attacker could do with this.",
+    "input": {
+      "url": "https://example.com/exports/users_export.csv",
+      "http_status": 200,
+      "category": "file_exposure",
+      "dork_used": "site:example.com ext:csv",
+      "title": "users_export.csv",
+      "snippet": "id,email,name,phone,address"
+    },
+    "output": {
+      "risk_level": "critical",
+      "title": "Exposed User Data Export (CSV)",
+      "explanation": "A CSV export file containing user data (emails, names, phone numbers, addresses) is publicly downloadable. This constitutes a significant data breach and likely violates GDPR, CCPA, or other applicable data protection regulations. Attackers can use this data for targeted phishing campaigns, identity theft, social engineering, and selling the data on underground markets.",
+      "impact": "Data breach, regulatory violations (GDPR/CCPA), identity theft risk for users, reputational damage",
+      "remediation": [
+        "Remove the file from public access immediately",
+        "Assess the full scope of exposed data",
+        "Engage legal counsel regarding data breach notification obligations",
+        "Notify affected users as required by applicable law",
+        "Implement access controls on all data export functionality",
+        "Audit how the file ended up in a public directory"
+      ]
+    }
+  },
+  {
+    "id": "ex_010",
+    "instruction": "Analyze the following scan result and provide a complete security assessment.",
+    "input": {
+      "url": "https://example.com/wp-admin/",
+      "http_status": 302,
+      "category": "admin_panels",
+      "dork_used": "site:example.com inurl:wp-admin",
+      "title": "Redirecting...",
+      "redirect_url": "https://example.com/wp-login.php"
+    },
+    "output": {
+      "risk_level": "medium",
+      "title": "WordPress Admin Panel Exposed (Redirects to Login)",
+      "explanation": "The WordPress admin panel is publicly reachable, though it redirects to the login page (expected behavior). The admin panel is not directly accessible without credentials, but the public exposure still allows brute-force and credential stuffing attacks. The redirect confirms WordPress is in use, which narrows the attack surface for CMS-specific vulnerabilities.",
+      "impact": "Brute-force attack surface, WordPress fingerprinting, targeted plugin/theme exploit attempts",
+      "remediation": [
+        "Add IP-based access restriction to wp-admin and wp-login.php",
+        "Enable two-factor authentication via a security plugin",
+        "Install a login protection plugin with rate limiting and lockout",
+        "Keep WordPress core, themes, and plugins up to date",
+        "Use a web application firewall (WAF) to filter malicious requests"
+      ]
+    }
+  },
+  {
+    "id": "ex_011",
+    "instruction": "Generate an AI analysis summary for the following completed scan.",
+    "input": {
+      "target": "example.com",
+      "total_urls_found": 23,
+      "total_alive": 11,
+      "findings_by_risk": {
+        "critical": 3,
+        "high": 4,
+        "medium": 3,
+        "low": 1,
+        "info": 0
+      },
+      "categories_with_findings": ["file_exposure", "admin_panels", "credential_leaks"],
+      "top_findings": [
+        {"url": "example.com/.env", "risk": "critical", "category": "credential_leaks"},
+        {"url": "example.com/backup/db.sql", "risk": "critical", "category": "database_dumps"},
+        {"url": "example.com/admin/", "risk": "high", "category": "admin_panels"}
+      ]
+    },
+    "output": {
+      "overall_risk": "critical",
+      "summary": "The reconnaissance scan of example.com revealed serious security vulnerabilities requiring immediate attention. Of 23 URLs discovered, 11 were confirmed accessible, with 3 critical and 4 high severity findings. The most severe issue is an exposed .env file containing application credentials, combined with a publicly accessible database dump. These findings together suggest a systemic misconfiguration issue rather than isolated incidents.",
+      "key_concerns": [
+        "Exposed credential files indicate secrets management is not enforced",
+        "Publicly accessible database backup suggests no backup storage policy",
+        "Admin panel without IP restriction is an active brute-force target"
+      ],
+      "immediate_actions": [
+        "Rotate all credentials found in the .env file within the next hour",
+        "Remove the database SQL dump from public access immediately",
+        "Restrict admin panel access to trusted IPs",
+        "Conduct a full audit of the web directory structure"
+      ],
+      "risk_score": 9.2
+    }
+  },
+  {
+    "id": "ex_012",
+    "instruction": "Explain what this dork query is designed to find and its security implications.",
+    "input": {
+      "dork": "site:example.com \"private_key\" ext:pem",
+      "category": "credential_leaks"
+    },
+    "output": {
+      "risk_level": "critical",
+      "explanation": "This dork searches for PEM-encoded private key files on the target domain. PEM files with 'private_key' in their content are typically SSL/TLS certificate private keys or SSH private keys. These are the most sensitive cryptographic materials in a system.",
+      "what_it_targets": "SSL/TLS private keys, SSH private keys, code signing keys stored in .pem format",
+      "severity_reasoning": "Private key exposure is immediately critical because: 1) TLS private keys allow decryption of all past and future SSL traffic to the server. 2) SSH private keys allow direct server access. 3) There is no partial exposure — the moment a key is seen, full compromise is achievable.",
+      "remediation": "Revoke and reissue all certificates. Rotate SSH keys. Audit server access logs immediately. Never store private keys in web-accessible directories."
+    }
+  }
+]
