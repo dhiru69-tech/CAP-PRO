@@ -1,0 +1,149 @@
+version: "3.9"
+
+# ══════════════════════════════════════════════════════════════
+#  ReconMind — Full Stack Docker Compose
+#
+#  Services:
+#    db        → PostgreSQL 16 database
+#    backend   → FastAPI backend (port 8000)
+#    scanner   → Scan engine worker (no port — runs background)
+#    ai_worker → AI analysis worker (no port — runs background)
+#    nginx     → Reverse proxy + static frontend (port 80/443)
+#
+#  Usage:
+#    cp .env.example .env   # fill in secrets
+#    docker compose up -d
+#    docker compose logs -f
+# ══════════════════════════════════════════════════════════════
+
+services:
+
+  # ─────────────────────────────────────
+  # PostgreSQL Database
+  # ─────────────────────────────────────
+  db:
+    image: postgres:16-alpine
+    container_name: reconmind_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB:       ${POSTGRES_DB:-reconmind}
+      POSTGRES_USER:     ${POSTGRES_USER:-reconmind}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./2_backend/database/migrations/001_initial.sql:/docker-entrypoint-initdb.d/001_initial.sql:ro
+    ports:
+      - "5432:5432"          # Remove in production
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-reconmind}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - reconmind_net
+
+  # ─────────────────────────────────────
+  # FastAPI Backend
+  # ─────────────────────────────────────
+  backend:
+    build:
+      context: ./2_backend
+      dockerfile: ../7_deployment/docker/Dockerfile.backend
+    container_name: reconmind_backend
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-reconmind}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-reconmind}
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - reports_data:/app/reports/generated
+    networks:
+      - reconmind_net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ─────────────────────────────────────
+  # Scanner Worker
+  # ─────────────────────────────────────
+  scanner:
+    build:
+      context: ./3_scanner
+      dockerfile: ../7_deployment/docker/Dockerfile.scanner
+    container_name: reconmind_scanner
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-reconmind}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-reconmind}
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - reconmind_net
+
+  # ─────────────────────────────────────
+  # AI Analysis Worker
+  # ─────────────────────────────────────
+  ai_worker:
+    build:
+      context: ./2_backend
+      dockerfile: ../7_deployment/docker/Dockerfile.backend
+    container_name: reconmind_ai_worker
+    restart: unless-stopped
+    command: python -m ai.ai_worker
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-reconmind}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-reconmind}
+    depends_on:
+      db:
+        condition: service_healthy
+      backend:
+        condition: service_healthy
+    volumes:
+      - reports_data:/app/reports/generated
+      - ai_model_data:/app/ai-model/model   # Mount trained model here
+    networks:
+      - reconmind_net
+
+  # ─────────────────────────────────────
+  # Nginx — Reverse Proxy + Frontend
+  # ─────────────────────────────────────
+  nginx:
+    image: nginx:alpine
+    container_name: reconmind_nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./7_deployment/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./1_frontend:/usr/share/nginx/html:ro
+      - ./7_deployment/nginx/ssl:/etc/nginx/ssl:ro   # Add SSL certs here
+    depends_on:
+      - backend
+    networks:
+      - reconmind_net
+
+# ──────────────────────────────────────
+# Volumes
+# ──────────────────────────────────────
+volumes:
+  postgres_data:
+    driver: local
+  reports_data:
+    driver: local
+  ai_model_data:
+    driver: local
+
+# ──────────────────────────────────────
+# Networks
+# ──────────────────────────────────────
+networks:
+  reconmind_net:
+    driver: bridge

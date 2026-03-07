@@ -1,0 +1,40 @@
+version: "3.9"
+
+# ══════════════════════════════════════════════════════════════
+#  ReconMind — Development Overrides
+#
+#  Usage:
+#    docker compose -f docker-compose.yml -f docker-compose.dev.yml up
+#
+#  Differences from production:
+#    - Backend hot-reload enabled (--reload)
+#    - Source code mounted as volumes (no rebuild on changes)
+#    - Debug logging enabled
+#    - Nginx not needed (access backend directly at :8000)
+# ══════════════════════════════════════════════════════════════
+
+services:
+
+  backend:
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+    volumes:
+      - ./2_backend:/app            # Live code mount
+      - reports_data:/app/reports/generated
+    environment:
+      DEBUG: "true"
+      LOG_LEVEL: "debug"
+
+  scanner:
+    volumes:
+      - ./3_scanner:/app            # Live code mount
+    environment:
+      SCANNER_DEBUG: "true"
+
+  ai_worker:
+    volumes:
+      - ./2_backend:/app
+      - ai_model_data:/app/ai-model/model
+
+  db:
+    ports:
+      - "5432:5432"                 # Expose DB in dev for direct access

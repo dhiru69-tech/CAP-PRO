@@ -1,0 +1,23 @@
+# ══════════════════════════════════════════════════════════════
+#  ReconMind — Scanner Worker Dockerfile
+# ══════════════════════════════════════════════════════════════
+
+FROM python:3.11-slim
+
+RUN apt-get update && apt-get install -y \
+    gcc \
+    libpq-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY . .
+
+RUN useradd -m -u 1001 scanner && chown -R scanner:scanner /app
+USER scanner
+
+# Scanner worker — polls DB and runs scans
+CMD ["python", "-m", "scanner.engine.worker"]
