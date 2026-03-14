@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>ReconMind — AI Reconnaissance Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="styles.css"/>
+</head>
+<body>
+
+<!-- ════════════════════════════════════
+     PAGE 1: LANDING
+════════════════════════════════════ -->
+<div id="landing" class="page active" style="flex-direction:column">
+
+  <!-- Navbar -->
+  <nav class="nav">
+    <a class="nav-logo" href="#">
+      <div class="nav-logo-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+          <path d="M11 8v6M8 11h6"/>
+        </svg>
+      </div>
+      ReconMind
+      <span class="nav-badge">BETA</span>
+    </a>
+    <div class="nav-actions">
+      <button class="btn btn-ghost" onclick="openLogin()">Sign In</button>
+      <button class="btn btn-primary" onclick="openLogin()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        Start Scanning
+      </button>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-tag">
+      <span class="hero-tag-dot"></span>
+      AI-Powered Reconnaissance Platform
+    </div>
+    <h1 class="hero-title">
+      Intelligent recon,<br/><em>built for security teams.</em>
+    </h1>
+    <p class="hero-sub">
+      ReconMind combines automated dork-based discovery with a local AI model to surface exposures, classify risks, and generate actionable reports.
+    </p>
+    <div class="hero-actions">
+      <button class="btn btn-primary" onclick="openLogin()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        Start Scanning — It's Free
+      </button>
+      <button class="btn btn-ghost" style="font-size:13.5px">View Architecture →</button>
+    </div>
+    <p class="hero-note">Requires Google Sign-In · Local AI model · No data leaves your server</p>
+  </section>
+
+  <!-- Features -->
+  <div class="features">
+    <div class="feature">
+      <div class="feature-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/>
+        </svg>
+      </div>
+      <div class="feature-title">Dynamic Dork Engine</div>
+      <div class="feature-desc">Generates targeted dorks per category — file exposure, admin panels, credential leaks, config files — for any domain.</div>
+    </div>
+    <div class="feature">
+      <div class="feature-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <path d="M12 2a10 10 0 1 0 10 10"/><circle cx="18" cy="6" r="3"/>
+        </svg>
+      </div>
+      <div class="feature-title">Local AI Analysis</div>
+      <div class="feature-desc">Your own trained AI model analyzes scanner output, classifies findings, explains risks, and suggests remediation — no external API.</div>
+    </div>
+    <div class="feature">
+      <div class="feature-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+        </svg>
+      </div>
+      <div class="feature-title">Detailed Reports</div>
+      <div class="feature-desc">Export structured reports with scan summary, evidence, AI analysis, and recommended fixes. Built for real security workflows.</div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════
+     LOGIN MODAL
+════════════════════════════════════ -->
+<div class="overlay" id="loginOverlay" onclick="handleOverlayClick(event)">
+  <div class="modal" id="loginModal">
+    <button class="modal-close" onclick="closeLogin()">✕</button>
+
+    <div class="modal-logo">
+      <div class="modal-logo-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/><path d="M11 8v6M8 11h6"/>
+        </svg>
+      </div>
+      <span class="modal-logo-name">ReconMind</span>
+    </div>
+
+    <h2 class="modal-title">Welcome back</h2>
+    <p class="modal-sub">Sign in to access your workspace, scan history, and reports.</p>
+
+    <button class="btn btn-google" id="googleBtn" onclick="handleGoogleLogin()">
+      <!-- Google icon -->
+      <svg class="google-icon" viewBox="0 0 24 24">
+        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+      </svg>
+      <span id="googleBtnText">Continue with Google</span>
+      <div class="spinner" id="loginSpinner"></div>
+    </button>
+
+    <div class="divider">or</div>
+
+    <div style="background:var(--bg3,#0f0f12);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 16px;text-align:center">
+      <div style="font-size:12px;color:var(--text3);margin-bottom:3px">🔒 Demo Mode</div>
+      <div style="font-size:12px;color:var(--text2)">Click Google login to simulate authentication</div>
+    </div>
+
+    <p class="terms">
+      By continuing you agree to our <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.
+      Your data stays on your server.
+    </p>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════
+     PAGE 2: DASHBOARD
+════════════════════════════════════ -->
+<div id="dashboard" class="page" style="flex-direction:row">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="sidebar-logo-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/><path d="M11 8v6M8 11h6"/>
+        </svg>
+      </div>
+      <span class="sidebar-logo-name">ReconMind</span>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Workspace</div>
+      <a class="nav-link active" onclick="showView('home')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        Dashboard
+      </a>
+      <a class="nav-link" onclick="showView('scan')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
+        New Scan
+      </a>
+      <a class="nav-link" onclick="showView('results')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+        Results
+      </a>
+
+      <div class="nav-section-label">Tools</div>
+      <a class="nav-link" onclick="showView('dorks')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+        Dork Engine
+      </a>
+      <a class="nav-link" onclick="showView('ai')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 1 0 10 10"/><circle cx="18" cy="6" r="3"/></svg>
+        AI Analysis
+      </a>
+      <a class="nav-link" onclick="showView('reports')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        Reports
+      </a>
+
+      <div class="nav-section-label">Account</div>
+      <a class="nav-link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        Profile
+      </a>
+      <a class="nav-link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M1 12h4M19 12h4"/></svg>
+        Settings
+      </a>
+    </nav>
+
+    <div class="sidebar-user">
+      <div class="user-avatar" id="userAvatar">U</div>
+      <div class="user-info">
+        <div class="user-name" id="userName">User</div>
+        <div class="user-email" id="userEmail">user@gmail.com</div>
+      </div>
+      <button class="logout-btn" onclick="handleLogout()" title="Sign out">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+          <polyline points="16 17 21 12 16 7"/>
+          <line x1="21" y1="12" x2="9" y2="12"/>
+        </svg>
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <div class="dash-main">
+
+    <!-- ── HOME VIEW ── -->
+    <div id="view-home">
+      <div class="topbar">
+        <div>
+          <div class="topbar-title">Dashboard</div>
+          <div class="topbar-sub" id="welcomeSub">Good to see you back</div>
+        </div>
+        <button class="btn btn-primary" onclick="showView('scan')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          New Scan
+        </button>
+      </div>
+      <div class="content appear">
+
+        <!-- Welcome -->
+        <div class="welcome">
+          <div class="welcome-text">
+            <h3 id="welcomeMsg">Welcome to ReconMind 👋</h3>
+            <p>Your workspace is ready. Start your first scan or explore the dork engine.</p>
+          </div>
+          <button class="btn btn-primary" onclick="showView('scan')">Start First Scan →</button>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-grid mb-20">
+          <div class="stat-card">
+            <div class="stat-label">Total Scans</div>
+            <div class="stat-value">0</div>
+            <div class="stat-note">No scans yet</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Targets</div>
+            <div class="stat-value">0</div>
+            <div class="stat-note">Add your first target</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Findings</div>
+            <div class="stat-value">0</div>
+            <div class="stat-note">Awaiting first scan</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Reports</div>
+            <div class="stat-value">0</div>
+            <div class="stat-note">Generated reports</div>
+          </div>
+        </div>
+
+        <div class="grid-2 mb-20">
+          <!-- Scan History -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                Recent Scans
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="empty">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+                <div class="empty-title">No scans yet</div>
+                <div class="empty-sub">Your scan history will appear here</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- System Status -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                System Status
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="status-item">
+                <span class="status-label">Frontend</span>
+                <span class="status-online"><span class="dot dot-green"></span>Online</span>
+              </div>
+              <div class="status-item">
+                <span class="status-label">Auth System</span>
+                <span class="status-online"><span class="dot dot-green"></span>Active (Demo)</span>
+              </div>
+              <div class="status-item">
+                <span class="status-label">Backend API</span>
+                <span class="status-offline"><span class="dot dot-grey"></span>Not started</span>
+              </div>
+              <div class="status-item">
+                <span class="status-label">Scanner Engine</span>
+                <span class="status-offline"><span class="dot dot-grey"></span>Not started</span>
+              </div>
+              <div class="status-item" style="margin-bottom:0">
+                <span class="status-label">AI Model</span>
+                <span class="status-offline"><span class="dot dot-grey"></span>Not trained</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SCAN VIEW ── -->
+    <div id="view-scan" style="display:none">
+      <div class="topbar">
+        <div>
+          <div class="topbar-title">New Scan</div>
+          <div class="topbar-sub">Configure and launch a reconnaissance scan</div>
+        </div>
+      </div>
+      <div class="content appear">
+        <div class="scan-section">
+          <div class="section-label">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>
+            Target Configuration
+          </div>
+          <div class="input-row mb-16">
+            <div class="input-group">
+              <label class="input-label">Target Domain</label>
+              <input class="input" id="targetInput" type="text" placeholder="example.com"/>
+            </div>
+            <div>
+              <label class="input-label">Scan Depth</label>
+              <select class="select">
+                <option>Surface</option>
+                <option>Standard</option>
+                <option>Deep</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="section-label" style="margin-top:18px">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+            Dork Categories
+          </div>
+          <div class="dork-grid mb-16">
+            <div class="dork-tag file active" onclick="this.classList.toggle('active')">📁 File Exposure</div>
+            <div class="dork-tag admin active" onclick="this.classList.toggle('active')">🔐 Admin Panels</div>
+            <div class="dork-tag cred active" onclick="this.classList.toggle('active')">🔑 Credential Leaks</div>
+            <div class="dork-tag config active" onclick="this.classList.toggle('active')">⚙️ Config Files</div>
+            <div class="dork-tag file" onclick="this.classList.toggle('active')">🗄️ Database Dumps</div>
+            <div class="dork-tag admin" onclick="this.classList.toggle('active')">📋 Log Files</div>
+            <div class="dork-tag cred" onclick="this.classList.toggle('active')">🔒 API Keys</div>
+            <div class="dork-tag config" onclick="this.classList.toggle('active')">📂 Backup Files</div>
+          </div>
+
+          <div style="display:flex;gap:10px;align-items:center">
+            <button class="btn btn-primary" id="startBtn" onclick="startScan()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+              Start Scan
+            </button>
+            <button class="btn btn-ghost" onclick="resetScan()">Reset</button>
+            <span id="scanStatusMsg" style="font-size:12px;color:var(--text3)"></span>
+          </div>
+        </div>
+
+        <!-- Progress Card -->
+        <div class="card" id="progressCard" style="display:none">
+          <div class="card-header">
+            <div class="card-title">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-.39-4.38"/></svg>
+              Scan Progress
+            </div>
+            <span id="pctLabel" style="font-size:12px;font-weight:600;color:var(--accent2)">0%</span>
+          </div>
+          <div class="card-body">
+            <div class="progress-wrap"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+            <div class="progress-steps">
+              <div class="step" id="s1">1. Init</div>
+              <div class="step" id="s2">2. Dorks</div>
+              <div class="step" id="s3">3. Discovery</div>
+              <div class="step" id="s4">4. Validate</div>
+              <div class="step" id="s5">5. Evidence</div>
+            </div>
+            <div class="scan-log" id="scanLog">
+              <span><span class="log-ts">00:00:00</span>Scanner ready. Waiting for input...</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── RESULTS VIEW ── -->
+    <div id="view-results" style="display:none">
+      <div class="topbar">
+        <div>
+          <div class="topbar-title">Results</div>
+          <div class="topbar-sub">All discovered URLs and findings</div>
+        </div>
+        <button class="btn btn-ghost">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Export Report
+        </button>
+      </div>
+      <div class="content appear">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Discovered URLs</div>
+            <span style="font-size:12px;color:var(--text3)">0 results</span>
+          </div>
+          <div class="card-body">
+            <div class="empty">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+              <div class="empty-title">No results yet</div>
+              <div class="empty-sub">Discovered URLs will appear here after a scan. All links open in new tabs.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── DORKS VIEW ── -->
+    <div id="view-dorks" style="display:none">
+      <div class="topbar">
+        <div>
+          <div class="topbar-title">Dork Engine</div>
+          <div class="topbar-sub">View and manage dork templates</div>
+        </div>
+      </div>
+      <div class="content appear">
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-header"><div class="card-title">File Exposure</div><span class="badge badge-medium">High</span></div>
+            <div class="card-body" style="display:flex;flex-direction:column;gap:6px">
+              <code style="display:block;padding:8px 10px;background:var(--bg);border-radius:6px;font-size:12px;color:var(--text2);border:1px solid var(--border)">site:{target} ext:sql</code>
+              <code style="display:block;padding:8px 10px;background:var(--bg);border-radius:6px;font-size:12px;color:var(--text2);border:1px solid var(--border)">site:{target} ext:bak</code>
+              <code style="display:block;padding:8px 10px;background:var(--bg);border-radius:6px;font-size:12px;color:var(--text2);border:1px solid var(--border)">site:{target} ext:log</code>
+              <code style="display:block;padding:8px 10px;background:var(--bg);border-radius:6px;font-size:12px;color:var(--text2);border:1px solid var(--border)">site:{target} "index of" backup</code>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-title">Admin Panels</div><span class="badge badge-high">Critical</span></div>
+            <div class="card-body" style="display:flex;flex-direction:column;gap:6px">
+              <code style="display:block;padding:8px 10px;background:var(--bg);border-radius:6px;font-size:12px;color:var(--text2);border:1px solid var(--border)">site:{target} inurl:admin</code>
+              <code style="display:block;padding:8px 10px;background:var(--bg);border-radius:6px;font-size:12px;color:var(--text2);border:1px solid var(--border)">site:{target} inurl:login</code>
+              <code style="display:block;padding:8px 10px;background:var(--bg);border-radius:6px;font-size:12px;color:var(--text2);border:1px solid var(--border)">site:{target} intitle:"admin panel"</code>
+              <code style="display:block;padding:8px 10px;background:var(--bg);border-radius:6px;font-size:12px;color:var(--text2);border:1px solid var(--border)">site:{target} inurl:wp-admin</code>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-title">Credential Leaks</div><span class="badge badge-high">Critical</span></div>
+            <div class="card-body" style="display:flex;flex-direction:column;gap:6px">
+              <code style="display:block;padding:8px 10px;background:var(--bg);border-radius:6px;font-size:12px;color:var(--text2);border:1px solid var(--border)">site:{target} "api_key" OR "api_secret"</code>
+              <code style="display:block;padding:8px 10px;background:var(--bg);border-radius:6px;font-size:12px;color:var(--text2);border:1px solid var(--border)">site:{target} "DB_PASSWORD" ext:env</code>
+              <code style="display:block;padding:8px 10px;background:var(--bg);border-radius:6px;font-size:12px;color:var(--text2);border:1px solid var(--border)">site:{target} "password" filetype:txt</code>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-title">Config Files</div><span class="badge badge-medium">High</span></div>
+            <div class="card-body" style="display:flex;flex-direction:column;gap:6px">
+              <code style="display:block;padding:8px 10px;background:var(--bg);border-radius:6px;font-size:12px;color:var(--text2);border:1px solid var(--border)">site:{target} ext:xml inurl:config</code>
+              <code style="display:block;padding:8px 10px;background:var(--bg);border-radius:6px;font-size:12px;color:var(--text2);border:1px solid var(--border)">site:{target} ".htaccess"</code>
+              <code style="display:block;padding:8px 10px;background:var(--bg);border-radius:6px;font-size:12px;color:var(--text2);border:1px solid var(--border)">site:{target} "web.config" ext:config</code>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── AI VIEW ── -->
+    <div id="view-ai" style="display:none">
+      <div class="topbar">
+        <div>
+          <div class="topbar-title">AI Analysis</div>
+          <div class="topbar-sub">Local AI model — integrated after training</div>
+        </div>
+      </div>
+      <div class="content appear">
+        <div class="card mb-20">
+          <div class="card-body" style="padding:30px;text-align:center">
+            <div style="width:52px;height:52px;background:var(--accent-glow);border:1px solid var(--accent-border);border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--accent2)" stroke-width="1.8"><path d="M12 2a10 10 0 1 0 10 10"/><circle cx="18" cy="6" r="3"/></svg>
+            </div>
+            <h3 style="font-size:16px;font-weight:600;margin-bottom:6px">AI Model Not Trained Yet</h3>
+            <p style="font-size:13px;color:var(--text3);max-width:400px;margin:0 auto">Once scan data is collected and the training pipeline runs, AI will classify findings, explain exposures, and suggest remediations — all locally.</p>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">Pipeline</div></div>
+          <div class="card-body">
+            <div style="display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap">
+              <div style="padding:10px 16px;background:var(--surface);border:1px solid var(--border);border-radius:8px;font-size:13px;text-align:center"><div style="font-size:10px;color:var(--text3);margin-bottom:2px">STEP 1</div>Scanner Data</div>
+              <div style="color:var(--text3)">→</div>
+              <div style="padding:10px 16px;background:var(--surface);border:1px solid var(--border);border-radius:8px;font-size:13px;text-align:center"><div style="font-size:10px;color:var(--text3);margin-bottom:2px">STEP 2</div>AI Model</div>
+              <div style="color:var(--text3)">→</div>
+              <div style="padding:10px 16px;background:var(--accent-glow);border:1px solid var(--accent-border);border-radius:8px;font-size:13px;color:var(--accent2);text-align:center"><div style="font-size:10px;color:var(--accent2);margin-bottom:2px">OUTPUT</div>Report</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── REPORTS VIEW ── -->
+    <div id="view-reports" style="display:none">
+      <div class="topbar">
+        <div>
+          <div class="topbar-title">Reports</div>
+          <div class="topbar-sub">Saved scan reports</div>
+        </div>
+      </div>
+      <div class="content appear">
+        <div class="card">
+          <div class="card-body">
+            <div class="empty">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              <div class="empty-title">No reports yet</div>
+              <div class="empty-sub">Reports will be generated after completed scans</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end dash-main -->
+</div><!-- end dashboard -->
+
+<script src="script.js"></script>
+</body>
+</html>
